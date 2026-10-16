@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kayra Küçük · Yazılım Mühendisliği Öğrencisi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-soft: #12121a;
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-hover: rgba(255, 255, 255, 0.07);
+    --border: rgba(255, 255, 255, 0.08);
+    --text: #e8e8ef;
+    --text-dim: #9a9aae;
+    --accent: #7c5cff;
+    --accent-2: #22d3ee;
+    --accent-glow: rgba(124, 92, 255, 0.35);
+    --radius: 20px;
+    --maxw: 920px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Animated background glow */
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+  }
+  .bg-glow::before,
+  .bg-glow::after {
+    content: '';
+    position: absolute;
+    width: 50vw;
+    height: 50vw;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+  }
+  .bg-glow::before {
+    background: var(--accent);
+    top: -15%;
+    left: -10%;
+    animation: float1 18s ease-in-out infinite;
+  }
+  .bg-glow::after {
+    background: var(--accent-2);
+    bottom: -20%;
+    right: -10%;
+    animation: float2 22s ease-in-out infinite;
+  }
+  @keyframes float1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(8vw, 6vh) scale(1.15); }
+  }
+  @keyframes float2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-7vw, -5vh) scale(1.1); }
+  }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Hero */
+  header {
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 0 60px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 7px 16px;
+    border-radius: 100px;
+    width: fit-content;
+    margin-bottom: 28px;
+  }
+  .eyebrow .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 10px var(--accent-2);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.8rem, 8vw, 5.2rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  h1 .grad {
+    background: linear-gradient(120deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .lead {
+    font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+    color: var(--text-dim);
+    max-width: 560px;
+    margin-bottom: 36px;
+  }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 26px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: linear-gradient(120deg, var(--accent), #9d7bff);
+    color: #fff;
+    box-shadow: 0 8px 30px var(--accent-glow);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--accent-glow); }
+  .btn-ghost {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface-hover); transform: translateY(-2px); }
+
+  /* Sections */
+  section { padding: 70px 0; }
+  .section-head {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 36px;
+  }
+  .section-head .num {
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--accent);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .section-head h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .section-head .line {
+    flex: 1; height: 1px; background: var(--border);
+  }
+
+  .about-text {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    max-width: 680px;
+  }
+  .about-text strong { color: var(--text); font-weight: 600; }
+
+  /* Info grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    transition: transform .25s ease, border-color .25s ease, background .25s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124, 92, 255, 0.4);
+    background: var(--surface-hover);
+  }
+  .card .ic {
+    font-size: 1.6rem;
+    margin-bottom: 14px;
+    display: block;
+  }
+  .card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .card p { color: var(--text-dim); font-size: 0.95rem; }
+
+  /* Interests chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 11px 20px;
+    border-radius: 100px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  .chip:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .chip .ic { font-size: 1.1rem; }
+
+  /* Focus / learning cards */
+  .focus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .focus-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 30px;
+    overflow: hidden;
+  }
+  .focus-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  }
+  .focus-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+  .focus-card p { color: var(--text-dim); font-size: 0.97rem; }
+
+  /* Footer */
+  footer {
+    padding: 60px 0 50px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+  footer .big {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  /* Reveal on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bg-glow::before, .bg-glow::after, .eyebrow .dot { animation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow"><span class="dot"></span>Yazılım Mühendisliği Öğrencisi</span>
+    <h1>Merhaba, ben <span class="grad">Kayra Küçük</span></h1>
+    <p class="lead">Yapay zeka ve siber güvenliğe meraklı bir yazılım mühendisliği öğrencisiyim. Öğrenmeyi, denemeyi ve yeni şeyler keşfetmeyi seviyorum.</p>
+    <div class="cta-row">
+      <a href="#ilgi" class="btn btn-primary">İlgi Alanlarım ↓</a>
+      <a href="#hakkimda" class="btn btn-ghost">Hakkımda</a>
+    </div>
+  </header>
+
+  <section id="hakkimda" class="reveal">
+    <div class="section-head">
+      <span class="num">01</span>
+      <h2>Hakkımda</h2>
+      <span class="line"></span>
+    </div>
+    <p class="about-text">
+      <strong>İstanbul Aydın Üniversitesi</strong>'nde <strong>Yazılım Mühendisliği</strong> okuyan 3. sınıf bir öğrenciyim. 2005 doğumluyum. En çok <strong>yapay zeka</strong> ve <strong>siber güvenlik</strong> alanlarına ilgi duyuyorum; bu konularda kendimi geliştirmek için sürekli yeni şeyler öğreniyorum. Farklı programlama dilleriyle de kısıtlı da olsa deneyimim var.
+    </p>
+  </section>
+
+  <section id="profil" class="reveal">
+    <div class="section-head">
+      <span class="num">02</span>
+      <h2>Kısa Profil</h2>
+      <span class="line"></span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <span class="ic">🎓</span>
+        <h3>Eğitim</h3>
+        <p>İstanbul Aydın Üniversitesi · Yazılım Mühendisliği · 3. Sınıf</p>
+      </div>
+      <div class="card">
+        <span class="ic">🎂</span>
+        <h3>Doğum Yılı</h3>
+        <p>2005</p>
+      </div>
+      <div class="card">
+        <span class="ic">🤖</span>
+        <h3>Odak</h3>
+        <p>Yapay Zeka & Siber Güvenlik</p>
+      </div>
+      <div class="card">
+        <span class="ic">💻</span>
+        <h3>Deneyim</h3>
+        <p>Çeşitli yazılım dillerinde temel seviye bilgi</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="ilgi" class="reveal">
+    <div class="section-head">
+      <span class="num">03</span>
+      <h2>İlgi Alanları & Hobiler</h2>
+      <span class="line"></span>
+    </div>
+    <div class="chips">
+      <span class="chip"><span class="ic">🤖</span>Yapay Zeka</span>
+      <span class="chip"><span class="ic">🛡️</span>Siber Güvenlik</span>
+      <span class="chip"><span class="ic">🖥️</span>Bilgisayar Başında Vakit Geçirmek</span>
+      <span class="chip"><span class="ic">🎬</span>Film İzlemek</span>
+      <span class="chip"><span class="ic">🎸</span>Gitar Çalmak</span>
+    </div>
+  </section>
+
+  <section id="ogreniyorum" class="reveal">
+    <div class="section-head">
+      <span class="num">04</span>
+      <h2>Şu Anda Öğreniyorum</h2>
+      <span class="line"></span>
+    </div>
+    <div class="focus-grid">
+      <div class="focus-card">
+        <h3>Kiro</h3>
+        <p>Kiro ile aktif olarak ilgileniyor, nasıl çalıştığını ve neler yapabildiğini öğrenmeye çalışıyorum.</p>
+      </div>
+      <div class="focus-card">
+        <h3>Yapay Zeka</h3>
+        <p>AI'ın temelleri ve uygulamaları üzerine kendimi geliştiriyorum.</p>
+      </div>
+      <div class="focus-card">
+        <h3>Siber Güvenlik</h3>
+        <p>Güvenlik dünyasını keşfediyor, bu alanda bilgi birikimimi artırıyorum.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="big">Kayra Küçük</div>
+    <p>Öğrenmeye ve geliştirmeye devam ediyor. 👋</p>
+    <p style="margin-top:14px; opacity:.6;">© 2026 · Yazılım Mühendisliği Öğrencisi</p>
+  </footer>
+
+</div>
+
+<script>
+  // Scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

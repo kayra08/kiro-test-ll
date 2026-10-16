@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Psk. Kayra – Randevu Sistemi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #5a84c9;
+      --primary-d: #3a64a8;
+      --primary-l: #b8d0f0;
+      --accent:    #d6e6f7;
+      --bg:        #f4f8fd;
+      --card:      #ffffff;
+      --text:      #2b313d;
+      --muted:     #7b8fa0;
+      --border:    #dde8f0;
+      --danger:    #d95a72;
+      --success:   #79a87a;
+      --radius:    14px;
+      --shadow:    0 4px 28px rgba(60,100,180,.10);
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(60,100,180,.08);
+    }
+    .logo {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: .2px;
+    }
+    .logo span { color: var(--primary-d); }
+    #headerUserInfo {
+      font-size: .85rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #headerUserInfo button {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: .8rem;
+      transition: all .2s;
+    }
+    #headerUserInfo button:hover { background: var(--bg); }
+
+    /* ── Screen wrapper ── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+
+    .screen { display: none; width: 100%; max-width: 460px; }
+    .screen.active { display: block; }
+    #appointmentScreen { max-width: 860px; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 44px 44px;
+      border: 1px solid var(--border);
+    }
+    @media(max-width:520px){ .card { padding: 28px 20px; } }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .card-header .clinic-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary-d);
+      letter-spacing: .3px;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+    .card-header .clinic-sub {
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--primary-l);
+      margin-bottom: 20px;
+    }
+    .card-header .divider-line {
+      width: 48px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary-l), transparent);
+      margin: 0 auto 20px;
+      border-radius: 2px;
+    }
+    .card-header h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .card-header p  { font-size: .88rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── Form ── */
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: .95rem;
+      color: var(--text);
+      background: #f7fafd;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(90,132,201,.18);
+      background: #fff;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:400px){ .form-row { grid-template-columns: 1fr; } }
+
+    /* ── Buttons ── */
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 8px;
+      font-size: .97rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: 4px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--primary-d); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(90,132,201,.4); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 1.5px solid var(--primary-l);
+      margin-top: 10px;
+    }
+    .btn-secondary:hover { background: var(--accent); border-color: var(--primary); }
+
+    .divider {
+      text-align: center;
+      margin: 20px 0 4px;
+      font-size: .82rem;
+      color: var(--muted);
+      position: relative;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%; width: 38%;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider::before { left: 0; }
+    .divider::after  { right: 0; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--text);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: .9rem;
+      z-index: 999;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.error { background: var(--danger); }
+    #toast.success { background: var(--success); }
+
+    /* ── Appointment Screen ── */
+    .appt-grid {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 24px;
+    }
+    @media(max-width:720px){ .appt-grid { grid-template-columns: 1fr; } }
+
+    /* Calendar */
+    .cal-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; }
+    .cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .cal-header h3 { font-size: 1rem; font-weight: 700; }
+    .cal-nav {
+      background: none; border: none; cursor: pointer;
+      color: var(--primary); font-size: 1.2rem; padding: 4px 8px;
+      border-radius: 6px; transition: background .2s;
+    }
+    .cal-nav:hover { background: var(--accent); }
+    .cal-weekdays {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      text-align: center; font-size: .74rem; font-weight: 600;
+      color: var(--muted); text-transform: uppercase; margin-bottom: 8px;
+    }
+    .cal-days {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: all .15s;
+      user-select: none;
+    }
+    .cal-day.empty { cursor: default; }
+    .cal-day.past, .cal-day.weekend {
+      color: var(--border);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .cal-day.available:hover { background: var(--accent); color: var(--primary-d); }
+    .cal-day.selected {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 2px 10px rgba(90,132,201,.45);
+    }
+    .cal-day.today:not(.selected) { font-weight: 700; color: var(--primary); }
+
+    /* Time slots */
+    .slots-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; }
+    .slots-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .slots-subtitle { font-size: .82rem; color: var(--muted); margin-bottom: 20px; }
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 10px;
+    }
+    .slot-btn {
+      padding: 10px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      text-align: center;
+    }
+    .slot-btn:hover:not(.taken) { border-color: var(--primary); color: var(--primary); background: var(--accent); }
+    .slot-btn.selected-slot { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 10px rgba(90,132,201,.4); }
+    .slot-btn.taken { background: #f4f8fd; color: var(--border); cursor: not-allowed; text-decoration: line-through; }
+
+    .confirm-btn {
+      margin-top: 24px;
+    }
+
+    /* My Appointments */
+    .my-appts { margin-top: 24px; }
+    .my-appts h3 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+    .appt-item {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .appt-item .appt-info { line-height: 1.6; }
+    .appt-item .appt-date { font-weight: 700; font-size: .95rem; }
+    .appt-item .appt-time { font-size: .85rem; color: var(--muted); }
+    .appt-cancel {
+      background: none; border: 1px solid var(--border);
+      color: var(--danger); padding: 5px 12px; border-radius: 6px;
+      cursor: pointer; font-size: .78rem; font-weight: 600;
+      transition: all .2s; white-space: nowrap;
+    }
+    .appt-cancel:hover { background: #fff0f3; border-color: var(--danger); }
+
+    .no-appts {
+      text-align: center; color: var(--muted); font-size: .9rem;
+      padding: 24px 0;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      max-width: 400px; width: 90%;
+      text-align: center;
+      transform: scale(.92);
+      transition: transform .25s;
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal .modal-icon { font-size: 2.8rem; margin-bottom: 14px; }
+    .modal h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
+    .modal p  { font-size: .9rem; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+    .modal-btns { display: flex; gap: 10px; }
+    .modal-btns .btn { margin-top: 0; }
+
+    /* Password strength */
+    .pwd-hint { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+
+    /* Validation */
+    .input-error { border-color: var(--danger) !important; }
+    .field-msg { font-size: .76rem; color: var(--danger); margin-top: 3px; min-height: 16px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Psk. Kayra</div>
+  <div id="headerUserInfo"></div>
+</header>
+
+<main id="mainArea">
+  <!-- ── GİRİŞ EKRANI ── -->
+  <div class="screen active" id="loginScreen">
+    <div class="card">
+      <div class="card-header">
+        <div class="clinic-name">Psk. Kayra</div>
+        <div class="clinic-sub">Bireysel Psikoterapi</div>
+        <div class="divider-line"></div>
+        <h1>Hoş Geldiniz</h1>
+        <p>Randevu sisteminize giriş yapın</p>
+      </div>
+      <div class="form-group">
+        <label>TC Kimlik Numarası</label>
+        <input type="text" id="loginTC" maxlength="11" placeholder="12345678901" inputmode="numeric" />
+        <div class="field-msg" id="loginTCMsg"></div>
+      </div>
+      <div class="form-group">
+        <label>Şifre</label>
+        <input type="password" id="loginPass" placeholder="••••••••" />
+        <div class="field-msg" id="loginPassMsg"></div>
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Giriş Yap</button>
+      <div class="divider">veya</div>
+      <button class="btn btn-secondary" onclick="showScreen('registerScreen')">Üye Ol</button>
+    </div>
+  </div>
+
+  <!-- ── KAYIT EKRANI ── -->
+  <div class="screen" id="registerScreen">
+    <div class="card">
+      <div class="card-header">
+        <div class="clinic-name" style="font-size:1.35rem;">Üye Ol</div>
+        <div class="clinic-sub">Yeni Hesap Oluşturun</div>
+        <div class="divider-line"></div>
+        <p>Birkaç adımda kayıt olun</p>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ad</label>
+          <input type="text" id="regName" placeholder="Adınız" />
+          <div class="field-msg" id="regNameMsg"></div>
+        </div>
+        <div class="form-group">
+          <label>Soyad</label>
+          <input type="text" id="regSurname" placeholder="Soyadınız" />
+          <div class="field-msg" id="regSurnameMsg"></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cinsiyet</label>
+          <select id="regGender">
+            <option value="">Seçiniz</option>
+            <option value="Kadın">Kadın</option>
+            <option value="Erkek">Erkek</option>
+            <option value="Belirtmek istemiyorum">Belirtmek istemiyorum</option>
+          </select>
+          <div class="field-msg" id="regGenderMsg"></div>
+        </div>
+        <div class="form-group">
+          <label>Doğum Tarihi</label>
+          <input type="date" id="regBirth" />
+          <div class="field-msg" id="regBirthMsg"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Telefon Numarası</label>
+        <input type="text" id="regPhone" maxlength="11" placeholder="05XXXXXXXXX" inputmode="numeric" />
+        <div class="field-msg" id="regPhoneMsg"></div>
+      </div>
+      <div class="form-group">
+        <label>TC Kimlik Numarası</label>
+        <input type="text" id="regTC" maxlength="11" placeholder="12345678901" inputmode="numeric" />
+        <div class="field-msg" id="regTCMsg"></div>
+      </div>
+      <div class="form-group">
+        <label>Şifre</label>
+        <input type="password" id="regPass" placeholder="En az 6 karakter" oninput="checkPwd(this)" />
+        <div class="pwd-hint" id="pwdStrength"></div>
+        <div class="field-msg" id="regPassMsg"></div>
+      </div>
+      <div class="form-group">
+        <label>Şifre Tekrar</label>
+        <input type="password" id="regPass2" placeholder="Şifreyi tekrar girin" />
+        <div class="field-msg" id="regPass2Msg"></div>
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()">Kayıt Ol</button>
+      <div class="divider">zaten üye misiniz?</div>
+      <button class="btn btn-secondary" onclick="showScreen('loginScreen')">Giriş Yap</button>
+    </div>
+  </div>
+
+  <!-- ── RANDEVU EKRANI ── -->
+  <div class="screen" id="appointmentScreen">
+    <div style="margin-bottom:24px;">
+      <h2 style="font-size:1.3rem;font-weight:700;">Randevu Al</h2>
+      <p style="color:var(--muted);font-size:.88rem;margin-top:4px;">
+        Uzm. Psk. <strong>Kayra</strong> – Bireysel Terapi &nbsp;·&nbsp; Seans süresi: 45 dakika
+      </p>
+    </div>
+    <div class="appt-grid">
+      <!-- Takvim -->
+      <div class="cal-card">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="changeMonth(-1)">&#8249;</button>
+          <h3 id="calTitle"></h3>
+          <button class="cal-nav" onclick="changeMonth(1)">&#8250;</button>
+        </div>
+        <div class="cal-weekdays">
+          <div>Pt</div><div>Sa</div><div>Ça</div><div>Pe</div><div>Cu</div>
+          <div style="color:#dde8f0;">Ct</div>
+          <div style="color:#dde8f0;">Pz</div>
+        </div>
+        <div class="cal-days" id="calDays"></div>
+      </div>
+
+      <!-- Saatler + Randevularım -->
+      <div>
+        <div class="slots-card">
+          <div class="slots-title" id="slotsTitle">Gün Seçiniz</div>
+          <div class="slots-subtitle" id="slotsSubtitle">Takvimden bir gün seçerek uygun saatleri görün</div>
+          <div class="slots-grid" id="slotsGrid"></div>
+          <div id="confirmArea" style="display:none;">
+            <button class="btn btn-primary confirm-btn" onclick="openConfirmModal()">Randevuyu Onayla</button>
+          </div>
+        </div>
+
+        <div class="my-appts">
+          <h3>Randevularım</h3>
+          <div id="myApptsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ── ONAY MODAL ── -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-icon">📅</div>
+    <h2>Randevu Onayı</h2>
+    <p id="confirmText"></p>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Vazgeç</button>
+      <button class="btn btn-primary" onclick="confirmAppointment()">Onayla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── İPTAL MODAL ── -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <h2>Randevu İptali</h2>
+    <p id="cancelText"></p>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal('cancelModal')">Vazgeç</button>
+      <button class="btn btn-primary" style="background:var(--danger);" onclick="confirmCancel()">İptal Et</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════
+   DATA LAYER  (localStorage)
+══════════════════════════════════════ */
+const DB_USERS = 'psyUsers';
+const DB_APPTS = 'psyAppts';
+let currentUser = null;
+
+function getUsers() { return JSON.parse(localStorage.getItem(DB_USERS) || '[]'); }
+function saveUsers(u) { localStorage.setItem(DB_USERS, JSON.stringify(u)); }
+function getAppts() { return JSON.parse(localStorage.getItem(DB_APPTS) || '[]'); }
+function saveAppts(a) { localStorage.setItem(DB_APPTS, JSON.stringify(a)); }
+
+/* ══════════════════════════════════════
+   SCREENS
+══════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'appointmentScreen') {
+    renderHeader();
+    renderCalendar();
+    renderMyAppts();
+  }
+}
+
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+function renderHeader() {
+  const el = document.getElementById('headerUserInfo');
+  if (currentUser) {
+    el.innerHTML = `<span>${currentUser.name} ${currentUser.surname}</span>
+      <button onclick="doLogout()">Çıkış</button>`;
+  } else { el.innerHTML = ''; }
+}
+
+function doLogout() {
+  currentUser = null;
+  renderHeader();
+  showScreen('loginScreen');
+}
+
+/* ══════════════════════════════════════
+   VALIDATION HELPERS
+══════════════════════════════════════ */
+function isValidTC(tc) { return /^\d{11}$/.test(tc) && tc[0] !== '0'; }
+function isValidPhone(p) { return /^0[5][0-9]{9}$/.test(p); }
+function clearMsgs(...ids) { ids.forEach(i => { const el=document.getElementById(i); if(el) el.textContent=''; }); }
+function setErr(id, msg) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = msg;
+}
+function setInputErr(id, hasErr) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  hasErr ? el.classList.add('input-error') : el.classList.remove('input-error');
+}
+
+/* ══════════════════════════════════════
+   PASSWORD STRENGTH
+══════════════════════════════════════ */
+function checkPwd(input) {
+  const v = input.value;
+  const el = document.getElementById('pwdStrength');
+  if (!v) { el.textContent = ''; return; }
+  let score = 0;
+  if (v.length >= 8) score++;
+  if (/[A-Z]/.test(v)) score++;
+  if (/\d/.test(v)) score++;
+  if (/[^A-Za-z0-9]/.test(v)) score++;
+  const labels = ['','Zayıf 🔴','Orta 🟡','İyi 🟢','Güçlü 💪'];
+  el.textContent = score ? `Şifre gücü: ${labels[score]}` : '';
+}
+
+/* ══════════════════════════════════════
+   LOGIN
+══════════════════════════════════════ */
+function doLogin() {
+  const tc   = document.getElementById('loginTC').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  clearMsgs('loginTCMsg','loginPassMsg');
+  setInputErr('loginTC', false); setInputErr('loginPass', false);
+
+  let ok = true;
+  if (!isValidTC(tc)) { setErr('loginTCMsg','Geçerli bir TC kimlik numarası girin'); setInputErr('loginTC',true); ok=false; }
+  if (!pass) { setErr('loginPassMsg','Şifre boş olamaz'); setInputErr('loginPass',true); ok=false; }
+  if (!ok) return;
+
+  const users = getUsers();
+  const user  = users.find(u => u.tc === tc && u.pass === btoa(pass));
+  if (!user) {
+    setErr('loginPassMsg','TC numarası veya şifre hatalı');
+    setInputErr('loginPass',true);
+    return;
+  }
+  currentUser = user;
+  showScreen('appointmentScreen');
+}
+
+/* ══════════════════════════════════════
+   REGISTER
+══════════════════════════════════════ */
+function doRegister() {
+  const name    = document.getElementById('regName').value.trim();
+  const surname = document.getElementById('regSurname').value.trim();
+  const gender  = document.getElementById('regGender').value;
+  const birth   = document.getElementById('regBirth').value;
+  const phone   = document.getElementById('regPhone').value.trim();
+  const tc      = document.getElementById('regTC').value.trim();
+  const pass    = document.getElementById('regPass').value;
+  const pass2   = document.getElementById('regPass2').value;
+
+  clearMsgs('regNameMsg','regSurnameMsg','regGenderMsg','regBirthMsg','regPhoneMsg','regTCMsg','regPassMsg','regPass2Msg');
+  ['regName','regSurname','regGender','regBirth','regPhone','regTC','regPass','regPass2']
+    .forEach(id => setInputErr(id, false));
+
+  let ok = true;
+  if (!name)    { setErr('regNameMsg','Ad boş olamaz'); setInputErr('regName',true); ok=false; }
+  if (!surname) { setErr('regSurnameMsg','Soyad boş olamaz'); setInputErr('regSurname',true); ok=false; }
+  if (!gender)  { setErr('regGenderMsg','Cinsiyet seçiniz'); setInputErr('regGender',true); ok=false; }
+  if (!birth)   { setErr('regBirthMsg','Doğum tarihi seçiniz'); setInputErr('regBirth',true); ok=false; }
+  if (!isValidPhone(phone)) { setErr('regPhoneMsg','Geçerli bir telefon numarası girin (05XX...)'); setInputErr('regPhone',true); ok=false; }
+  if (!isValidTC(tc))  { setErr('regTCMsg','Geçerli bir TC kimlik numarası girin (11 hane)'); setInputErr('regTC',true); ok=false; }
+  if (pass.length < 6) { setErr('regPassMsg','Şifre en az 6 karakter olmalı'); setInputErr('regPass',true); ok=false; }
+  if (pass !== pass2)  { setErr('regPass2Msg','Şifreler eşleşmiyor'); setInputErr('regPass2',true); ok=false; }
+  if (!ok) return;
+
+  const users = getUsers();
+  if (users.find(u => u.tc === tc)) {
+    setErr('regTCMsg','Bu TC numarasıyla zaten kayıt var'); setInputErr('regTC',true); return;
+  }
+
+  const newUser = { name, surname, gender, birth, phone, tc, pass: btoa(pass) };
+  users.push(newUser);
+  saveUsers(users);
+
+  showToast('Kayıt başarılı! Giriş yapabilirsiniz.', 'success');
+  setTimeout(() => showScreen('loginScreen'), 1200);
+}
+
+/* ══════════════════════════════════════
+   CALENDAR
+══════════════════════════════════════ */
+let calYear, calMonth, selectedDate = null;
+
+function initCal() {
+  const now = new Date();
+  calYear  = now.getFullYear();
+  calMonth = now.getMonth(); // 0-based
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+const MONTHS_TR = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+                   'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+function renderCalendar() {
+  document.getElementById('calTitle').textContent = `${MONTHS_TR[calMonth]} ${calYear}`;
+  const grid = document.getElementById('calDays');
+  grid.innerHTML = '';
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const first = new Date(calYear, calMonth, 1);
+  let startDow = first.getDay();
+  startDow = (startDow + 6) % 7;
+
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+
+  for (let i=0; i<startDow; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day empty';
+    grid.appendChild(el);
+  }
+
+  for (let d=1; d<=daysInMonth; d++) {
+    const date = new Date(calYear, calMonth, d);
+    const dow  = date.getDay();
+    const el   = document.createElement('div');
+    el.textContent = d;
+
+    const dateStr = fmtDate(date);
+    const isWeekend = dow === 0 || dow === 6;
+    const isPast    = date < today;
+    const isSel     = dateStr === selectedDate;
+    const isToday   = dateStr === fmtDate(today);
+
+    if (isWeekend) el.className = 'cal-day weekend';
+    else if (isPast) el.className = 'cal-day past';
+    else {
+      el.className = 'cal-day available' + (isSel ? ' selected' : '') + (isToday ? ' today' : '');
+      el.onclick = () => selectDate(dateStr, date);
+    }
+    grid.appendChild(el);
+  }
+}
+
+function fmtDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function fmtDateTR(ds) {
+  const [y,m,d] = ds.split('-');
+  const days = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+  const date = new Date(y,m-1,d);
+  return `${days[date.getDay()]}, ${d} ${MONTHS_TR[m-1]} ${y}`;
+}
+
+/* ══════════════════════════════════════
+   SLOTS
+══════════════════════════════════════ */
+const SLOT_HOURS = [9,10,11,12,13,14,15,16,17];
+let selectedSlot = null;
+
+function selectDate(dateStr, dateObj) {
+  selectedDate = dateStr;
+  selectedSlot = null;
+  renderCalendar();
+  renderSlots();
+}
+
+function renderSlots() {
+  const grid    = document.getElementById('slotsGrid');
+  const title   = document.getElementById('slotsTitle');
+  const sub     = document.getElementById('slotsSubtitle');
+  const confirm = document.getElementById('confirmArea');
+  grid.innerHTML = '';
+  confirm.style.display = 'none';
+
+  if (!selectedDate) return;
+  title.textContent = fmtDateTR(selectedDate);
+  sub.textContent   = 'Uygun bir saat seçin';
+
+  const appts = getAppts().filter(a => a.date === selectedDate);
+  const takenSlots = appts.map(a => a.hour);
+
+  SLOT_HOURS.forEach(h => {
+    const btn    = document.createElement('button');
+    const label  = `${String(h).padStart(2,'0')}:00`;
+    const taken  = takenSlots.includes(h);
+    const isSel  = selectedSlot === h;
+
+    btn.textContent = label;
+    btn.className   = 'slot-btn' +
+      (taken ? ' taken' : '') +
+      (isSel  ? ' selected-slot' : '');
+
+    if (!taken) {
+      btn.onclick = () => {
+        selectedSlot = h;
+        renderSlots();
+        document.getElementById('confirmArea').style.display = 'block';
+      };
+    }
+    grid.appendChild(btn);
+  });
+}
+
+/* ══════════════════════════════════════
+   CONFIRM / CANCEL APPOINTMENT
+══════════════════════════════════════ */
+function openConfirmModal() {
+  if (!selectedDate || selectedSlot === null) return;
+  document.getElementById('confirmText').innerHTML =
+    `<strong>${fmtDateTR(selectedDate)}</strong><br>
+     Saat: <strong>${String(selectedSlot).padStart(2,'0')}:00 – ${String(selectedSlot).padStart(2,'0')}:45</strong><br><br>
+     Uzm. Psk. Kayra ile randevunuzu onaylıyor musunuz?`;
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function confirmAppointment() {
+  const appts = getAppts();
+  if (appts.find(a => a.date === selectedDate && a.hour === selectedSlot)) {
+    closeModal('confirmModal');
+    showToast('Bu saat dolu, lütfen başka bir saat seçin.', 'error');
+    renderSlots();
+    return;
+  }
+  appts.push({
+    id:      Date.now(),
+    tc:      currentUser.tc,
+    date:    selectedDate,
+    hour:    selectedSlot,
+    created: new Date().toISOString()
+  });
+  saveAppts(appts);
+  closeModal('confirmModal');
+  selectedSlot = null;
+  renderSlots();
+  renderMyAppts();
+  showToast('Randevunuz başarıyla oluşturuldu! 🎉', 'success');
+}
+
+let cancelTarget = null;
+function openCancelModal(id) {
+  const appts = getAppts();
+  const appt  = appts.find(a => a.id === id);
+  if (!appt) return;
+  cancelTarget = id;
+  document.getElementById('cancelText').innerHTML =
+    `<strong>${fmtDateTR(appt.date)}</strong><br>
+     Saat: <strong>${String(appt.hour).padStart(2,'0')}:00 – ${String(appt.hour).padStart(2,'0')}:45</strong><br><br>
+     Bu randevuyu iptal etmek istediğinizden emin misiniz?`;
+  document.getElementById('cancelModal').classList.add('open');
+}
+
+function confirmCancel() {
+  let appts = getAppts();
+  appts = appts.filter(a => a.id !== cancelTarget);
+  saveAppts(appts);
+  cancelTarget = null;
+  closeModal('cancelModal');
+  renderSlots();
+  renderMyAppts();
+  showToast('Randevunuz iptal edildi.', 'error');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+/* ══════════════════════════════════════
+   MY APPOINTMENTS
+══════════════════════════════════════ */
+function renderMyAppts() {
+  const el = document.getElementById('myApptsList');
+  if (!currentUser) { el.innerHTML = ''; return; }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const appts = getAppts()
+    .filter(a => a.tc === currentUser.tc)
+    .filter(a => {
+      const [y,m,d] = a.date.split('-');
+      return new Date(y,m-1,d) >= today;
+    })
+    .sort((a,b) => a.date.localeCompare(b.date) || a.hour - b.hour);
+
+  if (!appts.length) {
+    el.innerHTML = '<div class="no-appts">Aktif randevunuz bulunmamaktadır.</div>';
+    return;
+  }
+
+  el.innerHTML = appts.map(a => `
+    <div class="appt-item">
+      <div class="appt-info">
+        <div class="appt-date">${fmtDateTR(a.date)}</div>
+        <div class="appt-time">🕐 ${String(a.hour).padStart(2,'0')}:00 – ${String(a.hour).padStart(2,'0')}:45 &nbsp;·&nbsp; Uzm. Psk. Kayra</div>
+      </div>
+      <button class="appt-cancel" onclick="openCancelModal(${a.id})">İptal Et</button>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent  = msg;
+  t.className    = type ? `show ${type}` : 'show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = '', 3200);
+}
+
+/* ══════════════════════════════════════
+   MODAL CLICK-OUTSIDE CLOSE
+══════════════════════════════════════ */
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+/* ══════════════════════════════════════
+   ONLY NUMERIC INPUT
+══════════════════════════════════════ */
+['loginTC','regTC','regPhone'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => { el.value = el.value.replace(/\D/g,''); });
+});
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+initCal();
+renderHeader();
+</script>
+</body>
+</html>
